@@ -77,40 +77,89 @@ namespace Pitstop.WorkshopManagement.Specs
             this.ScenarioTearDown();
         }
         
-        [Xunit.FactAttribute(DisplayName="Planned maintenance jobs should fall within one business day")]
+        [Xunit.TheoryAttribute(DisplayName="Maintenance jobs can be scheduled")]
         [Xunit.TraitAttribute("FeatureTitle", "WorkshopPlanning")]
-        [Xunit.TraitAttribute("Description", "Planned maintenance jobs should fall within one business day")]
-        public virtual void PlannedMaintenanceJobsShouldFallWithinOneBusinessDay()
+        [Xunit.TraitAttribute("Description", "Maintenance jobs can be scheduled")]
+        [Xunit.InlineDataAttribute("14-11-2019", "14-11-2019 08:00:00", "14-11-2019 10:00:00", "02f89e3b-b542-4f9b-9fa3-de3be8b35b9a", "1", new string[0])]
+        [Xunit.InlineDataAttribute("14-11-2019", "14-11-2019 08:00:00", "14-11-2019 10:00:00", "02f89e3b-b542-4f9b-9fa3-de3be8b35b9b", "2", new string[0])]
+        [Xunit.InlineDataAttribute("14-11-2019", "14-11-2019 08:00:00", "14-11-2019 10:00:00", "02f89e3b-b542-4f9b-9fa3-de3be8b35b9c", "3", new string[0])]
+        [Xunit.InlineDataAttribute("14-11-2019", "14-11-2019 08:00:00", "15-11-2019 10:00:00", "02f89e3b-b542-4f9b-9fa3-de3be8b35b9a", "3", new string[0])]
+        [Xunit.InlineDataAttribute("14-11-2019", "14-11-2019 08:00:00", "14-11-2019 10:00:00", "02f89e3b-b542-4f9b-9fa3-de3be8b35b9d", "3", new string[0])]
+        [Xunit.InlineDataAttribute("14-11-2019", "14-11-2019 09:00:00", "14-11-2019 10:00:00", "02f89e3b-b542-4f9b-9fa3-de3be8b35b9a", "3", new string[0])]
+        [Xunit.InlineDataAttribute("14-11-2019", "14-11-2019 12:00:00", "14-11-2019 14:00:00", "02f89e3b-b542-4f9b-9fa3-de3be8b35b9a", "4", new string[0])]
+        public virtual void MaintenanceJobsCanBeScheduled(string date, string startTime, string endTime, string vehicleId, string numberJobs, string[] exampleTags)
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Planned maintenance jobs should fall within one business day", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Maintenance jobs can be scheduled", null, exampleTags);
 #line 6
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 7
- testRunner.Given("I have a new workshop planning for 14-11-2019", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given(string.Format("I have a new workshop planning for {0}", date), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 8
- testRunner.When("I plan a maintenance job", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.And(string.Format("the {0} and {1} is set for vehicle {2}", startTime, endTime, vehicleId), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 9
- testRunner.Then("I should have one job in my planning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("I plan a maintenance job", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 10
+ testRunner.Then(string.Format("the WorkshopPlanning should contain {0} jobs", numberJobs), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
-        [Xunit.FactAttribute(DisplayName="Maintenance jobs that fall outside of one working day are not allowed.")]
+        [Xunit.FactAttribute(DisplayName="Selecting a date returns the maintenance jobs planned for the date in question")]
         [Xunit.TraitAttribute("FeatureTitle", "WorkshopPlanning")]
-        [Xunit.TraitAttribute("Description", "Maintenance jobs that fall outside of one working day are not allowed.")]
-        public virtual void MaintenanceJobsThatFallOutsideOfOneWorkingDayAreNotAllowed_()
+        [Xunit.TraitAttribute("Description", "Selecting a date returns the maintenance jobs planned for the date in question")]
+        public virtual void SelectingADateReturnsTheMaintenanceJobsPlannedForTheDateInQuestion()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Maintenance jobs that fall outside of one working day are not allowed.", null, ((string[])(null)));
-#line 11
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Selecting a date returns the maintenance jobs planned for the date in question", null, ((string[])(null)));
+#line 22
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 12
- testRunner.Given("I have a new workshop planning for 19-11-2019", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 13
- testRunner.When("I plan a maintenance job", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 14
- testRunner.Then("I should have no job in my planning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 23
+ testRunner.Given("I have a existing workshop planning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 24
+ testRunner.When("I view the planning for that date", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 25
+ testRunner.Then("I see 4 maintenance job in the workshop planning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Selecting a planned maintenance job returns the job details")]
+        [Xunit.TraitAttribute("FeatureTitle", "WorkshopPlanning")]
+        [Xunit.TraitAttribute("Description", "Selecting a planned maintenance job returns the job details")]
+        public virtual void SelectingAPlannedMaintenanceJobReturnsTheJobDetails()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Selecting a planned maintenance job returns the job details", null, ((string[])(null)));
+#line 27
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 28
+ testRunner.Given("I have a existing workshop planning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 29
+ testRunner.When("I select a maintenance job", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 30
+ testRunner.Then("I see the job status is Planned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="After a maintennance job has been completed the job is marked as finished")]
+        [Xunit.TraitAttribute("FeatureTitle", "WorkshopPlanning")]
+        [Xunit.TraitAttribute("Description", "After a maintennance job has been completed the job is marked as finished")]
+        public virtual void AfterAMaintennanceJobHasBeenCompletedTheJobIsMarkedAsFinished()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("After a maintennance job has been completed the job is marked as finished", null, ((string[])(null)));
+#line 32
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 33
+ testRunner.Given("I have a existing workshop planning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 34
+ testRunner.When("I select a maintenance job", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 35
+ testRunner.And("complete the selected job", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 36
+ testRunner.Then("I see the job status is Finished", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
