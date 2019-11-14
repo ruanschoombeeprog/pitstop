@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace WorkshopManagement.AcceptanceTests.Features.WorkshopPlanning
+namespace Pitstop.WorkshopManagement.Specs
 {
     using TechTalk.SpecFlow;
     
@@ -36,10 +36,8 @@ namespace WorkshopManagement.AcceptanceTests.Features.WorkshopPlanning
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Workshop Planning", "\t\tIn order for the workshop to function seemlessly planning is of great importanc" +
-                    "e. \r\n\t\tTo assist in planning, retrieving the planned schedule and job details sh" +
-                    "ould be possible.\r\n\t\tThe client wants to see all planned jobs with their latest " +
-                    "state by day.", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "WorkshopPlanning", "\tIn order to effectively plan work shop resources\r\n\tAs a memeber of the workshop " +
+                    "staff.\r\n\tI want be able to plan and schedule maintenance jobs for the workshop", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -79,32 +77,40 @@ namespace WorkshopManagement.AcceptanceTests.Features.WorkshopPlanning
             this.ScenarioTearDown();
         }
         
-        [Xunit.FactAttribute(DisplayName="Retrieve the workhsop schedule by date")]
-        [Xunit.TraitAttribute("FeatureTitle", "Workshop Planning")]
-        [Xunit.TraitAttribute("Description", "Retrieve the workhsop schedule by date")]
-        [Xunit.TraitAttribute("Category", "WorkshopManagementOverview")]
-        public virtual void RetrieveTheWorkhsopScheduleByDate()
+        [Xunit.FactAttribute(DisplayName="Planned maintenance jobs should fall within one business day")]
+        [Xunit.TraitAttribute("FeatureTitle", "WorkshopPlanning")]
+        [Xunit.TraitAttribute("Description", "Planned maintenance jobs should fall within one business day")]
+        public virtual void PlannedMaintenanceJobsShouldFallWithinOneBusinessDay()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Retrieve the workhsop schedule by date", null, new string[] {
-                        "WorkshopManagementOverview"});
-#line 7
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Planned maintenance jobs should fall within one business day", null, ((string[])(null)));
+#line 6
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
+#line 7
+ testRunner.Given("I have a new workshop planning for 14-11-2019", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 8
-  testRunner.Given("the user has selected the Workshop Management menu item", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-            TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Field",
-                        "Value"});
-            table1.AddRow(new string[] {
-                        "planningDate",
-                        "12-11-2019"});
+ testRunner.When("I plan a maintenance job", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 9
-  testRunner.And("todays date is the following", ((string)(null)), table1, "And ");
+ testRunner.Then("I should have one job in my planning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Maintenance jobs that fall outside of one working day are not allowed.")]
+        [Xunit.TraitAttribute("FeatureTitle", "WorkshopPlanning")]
+        [Xunit.TraitAttribute("Description", "Maintenance jobs that fall outside of one working day are not allowed.")]
+        public virtual void MaintenanceJobsThatFallOutsideOfOneWorkingDayAreNotAllowed_()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Maintenance jobs that fall outside of one working day are not allowed.", null, ((string[])(null)));
+#line 11
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
 #line 12
-  testRunner.When("the WebApp loads the Webshop management page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.Given("I have a new workshop planning for 19-11-2019", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 13
-  testRunner.Then("the WebApp should display 1 job", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("I plan a maintenance job", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 14
+ testRunner.Then("I should have no job in my planning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
