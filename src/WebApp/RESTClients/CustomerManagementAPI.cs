@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Configuration;
 using Pitstop.Models;
-using Microsoft.AspNetCore.Hosting;
 using Refit;
-using WebApp.Commands;
-using System.Net;
-using Microsoft.Extensions.Configuration;
-using System.Net.Http;
 using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using WebApp.Commands;
 
 namespace WebApp.RESTClients
 {
@@ -49,6 +48,11 @@ namespace WebApp.RESTClients
         public async Task RegisterCustomer(RegisterCustomer command)
         {
             await _restClient.RegisterCustomer(command);
+        }
+
+        public async Task UpdateCustomer([AliasAs("id")] string customerId, UpdateCustomer command)
+        {
+           await _restClient.UpdateCustomer(customerId, command);
         }
     }
 }

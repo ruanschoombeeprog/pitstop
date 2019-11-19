@@ -122,5 +122,10 @@ namespace WebApp.RESTClients
                 }
             }
         }
+
+        public async Task UpdateMaintenanceJob(string planningDate, string jobId, UpdateMaintenanceJob command)
+        {
+            await _restClient.UpdateMaintenanceJob(planningDate, jobId, command);
+        }
     }
 }

@@ -72,6 +72,27 @@ namespace PitStop.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Edit(DateTime planningDate, string jobId)
+        {
+            return await _resiliencyHelper.ExecuteResilient(async () =>
+            {
+                string dateStr = planningDate.ToString("yyyy-MM-dd");
+                var job = await _workshopManagementAPI.GetMaintenanceJob(dateStr, jobId);
+                var model = new WorkshopManagementEditViewModel
+                {
+                    Date = planningDate,
+                    StartTime = job.StartTime,
+                    EndTime = job.EndTime,
+                    Description = job.Description,
+                    Id = job.Id,
+                    Vehicles = await GetAvailableVehiclesList(),
+                    SelectedVehicleLicenseNumber = job.Vehicle.LicenseNumber
+                };
+                return View(model);
+            }, View("Offline", new WorkshopManagementOfflineViewModel()));
+        }
+
+        [HttpGet]
         public async Task<IActionResult> New(DateTime planningDate)
         {
             return await _resiliencyHelper.ExecuteResilient(async () =>
@@ -153,6 +174,62 @@ namespace PitStop.Controllers
             {
                 inputModel.Vehicles = await GetAvailableVehiclesList();
                 return View("New", inputModel);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditMaintenanceJob([FromForm] WorkshopManagementEditViewModel inputModel)
+        {
+            if (ModelState.IsValid)
+            {
+                return await _resiliencyHelper.ExecuteResilient(async () =>
+                {
+                    string dateTimeString = inputModel.Date.ToString("yyyy-MM-dd");
+
+                    try
+                    {
+                        // update maintenance job
+                        var startTime = inputModel.Date.Add(inputModel.StartTime.TimeOfDay);
+                        var endTime = inputModel.Date.Add(inputModel.EndTime.TimeOfDay);
+                        var vehicle = await _workshopManagementAPI.GetVehicleByLicenseNumber(inputModel.SelectedVehicleLicenseNumber);
+                        var customer = await _workshopManagementAPI.GetCustomerById(vehicle.OwnerId);
+
+                        var updateMaintenanceJobCommand = new UpdateMaintenanceJob(Guid.NewGuid(), 
+                            inputModel.Id, 
+                            startTime, 
+                            endTime,
+                            (customer.CustomerId, customer.Name, customer.TelephoneNumber),
+                            (vehicle.LicenseNumber, vehicle.Brand, vehicle.Type), 
+                            inputModel.Description);
+
+                        await _workshopManagementAPI.UpdateMaintenanceJob(
+                            dateTimeString, 
+                            updateMaintenanceJobCommand.JobId.ToString(), 
+                            updateMaintenanceJobCommand);
+                    }
+                    catch (ApiException ex)
+                    {
+                        if (ex.StatusCode == HttpStatusCode.Conflict)
+                        {
+                            // add errormessage from API exception to model
+                            var content = await ex.GetContentAsAsync<BusinessRuleViolation>();
+                            inputModel.Error = content.ErrorMessage;
+
+                            // repopulate list of available vehicles in the model
+                            inputModel.Vehicles = await GetAvailableVehiclesList();
+
+                            // back to New view
+                            return View("Edit", inputModel);
+                        }
+                    }
+
+                    return RedirectToAction("Index", new { planningDate = dateTimeString });
+                }, View("Offline", new WorkshopManagementOfflineViewModel()));
+            }
+            else
+            {
+                inputModel.Vehicles = await GetAvailableVehiclesList();
+                return View("Edit", inputModel);
             }
         }
 

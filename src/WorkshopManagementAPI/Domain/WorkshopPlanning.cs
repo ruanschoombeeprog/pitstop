@@ -36,6 +36,18 @@ namespace Pitstop.WorkshopManagementAPI.Domain
             return planning;
         }
 
+        public void UpdateMaintenanceJob(UpdateMaintenanceJob command)
+        {
+            // check business rules
+            this.UpdatedMaintenanceJobShouldFallWithinOneBusinessDay(command);
+            this.NumberOfParallelMaintenanceJobsMustNotExceedAvailableWorkStations(command);
+            this.NumberOfParallelMaintenanceJobsOnAVehicleIsOne(command);
+
+            // handle event
+            MaintenanceJobUpdated e = command.MapToMaintenanceJobUpdated();
+            RaiseEvent(e);
+        }
+
         public void PlanMaintenanceJob(PlanMaintenanceJob command)
         {
             // check business rules
@@ -87,6 +99,14 @@ namespace Pitstop.WorkshopManagementAPI.Domain
             Vehicle vehicle = new Vehicle(e.VehicleInfo.LicenseNumber, e.VehicleInfo.Brand, e.VehicleInfo.Type, customer.Id);
             job.Plan(e.JobId, e.StartTime, e.EndTime, vehicle, customer, e.Description);
             Jobs.Add(job);
+        }
+
+        private void Handle(MaintenanceJobUpdated e)
+        {
+            MaintenanceJob job = Jobs.FirstOrDefault(j => j.Id == e.JobId);
+            Customer customer = new Customer(e.CustomerInfo.Id, e.CustomerInfo.Name, e.CustomerInfo.TelephoneNumber);
+            Vehicle vehicle = new Vehicle(e.VehicleInfo.LicenseNumber, e.VehicleInfo.Brand, e.VehicleInfo.Type, customer.Id);
+            job.Update(e.StartTime, e.EndTime, vehicle, customer, e.Description);
         }
 
         private void Handle(MaintenanceJobFinished e)

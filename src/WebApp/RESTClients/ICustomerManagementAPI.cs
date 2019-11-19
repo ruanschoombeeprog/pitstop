@@ -16,5 +16,8 @@ namespace WebApp.RESTClients
 
         [Post("/customers")]
         Task RegisterCustomer(RegisterCustomer command);
+
+        [Put("/customers/{id}")]
+        Task UpdateCustomer([AliasAs("id")] string customerId, UpdateCustomer command);
     }
 }

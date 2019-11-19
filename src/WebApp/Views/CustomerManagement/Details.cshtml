@@ -36,9 +36,11 @@
             <tr>
                 <td width="150">LoyaltyLevel :</td>
                 <td><img src="@imagePath" /></td>
-            </tr>        
+            </tr>
+
         }
     </tbody>
 </table>
+<span><a class="btn btn-primary" href='@(Url.Action("Edit", "CustomerManagement", new { id = Model.Customer.CustomerId }))'>Edit</a></span>
 <span><a id="BackButton" asp-action="Index" asp-controller="CustomerManagement" class="btn btn-default">Back</a></span>
 
