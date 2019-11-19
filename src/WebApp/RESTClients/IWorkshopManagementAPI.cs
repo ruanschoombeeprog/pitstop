@@ -21,6 +21,9 @@ namespace WebApp.RESTClients
         [Post("/workshopplanning/{planningDate}/jobs")]
         Task PlanMaintenanceJob(string planningDate, PlanMaintenanceJob cmd);
 
+        [Put("/workshopplanning/{planningDate}/jobs/{jobId}")]
+        Task UpdateMaintenanceJob(string planningDate, string jobId, UpdateMaintenanceJob cmd);
+
         [Put("/workshopplanning/{planningDate}/jobs/{jobId}/finish")]
         Task FinishMaintenanceJob(string planningDate, string jobId, FinishMaintenanceJob cmd);
 

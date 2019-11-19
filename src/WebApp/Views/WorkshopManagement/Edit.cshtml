@@ -1,0 +1,45 @@
+﻿@model Pitstop.ViewModels.WorkshopManagementEditViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<h3 id="PageTitle">Workshop Management - edit maintenance job</h3>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="well-sm alert-danger">
+        <label>Unable to register: @Model.Error</label>
+    </div>
+}
+
+<form asp-controller="WorkshopManagement" asp-action="EditMaintenanceJob" method="post">
+    <div class="form-group">
+        <label asp-for="StartTime"></label>
+        <input asp-for="StartTime" type="text" class="form-control" />
+        <span asp-validation-for="StartTime" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EndTime"></label>
+        <input asp-for="EndTime" type="text" class="form-control" />
+        <span asp-validation-for="EndTime" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <input asp-for="Description" type="text" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="SelectedVehicleLicenseNumber"></label>
+        <select asp-for="SelectedVehicleLicenseNumber" asp-items="Model.Vehicles" class="form-control"></select>
+        <span asp-validation-for="SelectedVehicleLicenseNumber" class="text-danger"></span>
+    </div>
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="Date" type="hidden" />
+    <span><button id="SubmitButton" type="submit" class="btn btn-default">Save</button></span>
+    <span><a id="CancelButton" asp-action="Index" asp-controller="WorkshopManagement" class="btn btn-default">Cancel</a></span>
+</form>

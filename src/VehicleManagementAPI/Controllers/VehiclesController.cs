@@ -1,13 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Pitstop.Application.VehicleManagement.Model;
-using Pitstop.Application.VehicleManagement.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using Pitstop.Infrastructure.Messaging;
-using Pitstop.Application.VehicleManagement.Events;
 using Pitstop.Application.VehicleManagement.Commands;
+using Pitstop.Application.VehicleManagement.DataAccess;
+using Pitstop.Application.VehicleManagement.Model;
+using Pitstop.Infrastructure.Messaging;
 using Pitstop.VehicleManagementAPI.Mappers;
+using System;
+using System.Threading.Tasks;
 
 namespace Pitstop.Application.VehicleManagement.Controllers
 {
@@ -54,7 +54,7 @@ namespace Pitstop.Application.VehicleManagement.Controllers
                     await _dbContext.SaveChangesAsync();
 
                     // send event
-                    var e = VehicleRegistered.FromCommand(command);
+                    var e = Mappers.MapToVehicleRegistered(command);
                     await _messagePublisher.PublishMessageAsync(e.MessageType, e, "");
 
                     //return result
@@ -68,6 +68,56 @@ namespace Pitstop.Application.VehicleManagement.Controllers
                     "Try again, and if the problem persists " +
                     "see your system administrator.");
                 return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPut]
+        [Route("{licenseNumber}")]
+        public async Task<IActionResult> UpdateAsync([FromRoute] string licenseNumber, [FromBody] UpdateVehicle command)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var existingVehicle = await _dbContext.Vehicles
+                        .FirstOrDefaultAsync(o => o.LicenseNumber == licenseNumber);
+
+                    if (existingVehicle == null)
+                        return NotFound();
+
+                    existingVehicle.LicenseNumber = command.LicenseNumber;
+                    existingVehicle.Brand = command.Brand;
+                    existingVehicle.Type = command.Type;
+                    existingVehicle.OwnerId = command.OwnerId;
+                    
+                    try
+                    {
+                        _dbContext.Vehicles.Update(existingVehicle);
+                    }
+                    catch (Exception)
+                    {
+                        ModelState.AddModelError("", "Unable to save changes. " +
+                         "Try again, and if the problem persists " +
+                         "see your system administrator.");
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    }
+
+                    await _dbContext.SaveChangesAsync();
+
+                    var e = Mappers.MapToVehicleUpdated(command);
+                    await _messagePublisher.PublishMessageAsync(e.MessageType, e, "");
+
+                    return Ok();
+                }
+                return BadRequest();
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError("", "Unable to save changes. " +
+                      "Try again, and if the problem persists " +
+                      "see your system administrator.");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+                throw;
             }
         }
     }

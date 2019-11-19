@@ -1,15 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
+using Pitstop.CustomerManagementAPI.Commands;
 using Pitstop.CustomerManagementAPI.DataAccess;
+using Pitstop.CustomerManagementAPI.Events;
+using Pitstop.CustomerManagementAPI.Mappers;
 using Pitstop.CustomerManagementAPI.Model;
 using Pitstop.Infrastructure.Messaging;
-using Pitstop.CustomerManagementAPI.Events;
-using Pitstop.CustomerManagementAPI.Commands;
-using Pitstop.CustomerManagementAPI.Mappers;
-using Serilog;
 using System;
+using System.Threading.Tasks;
 
 namespace Pitstop.Application.CustomerManagementAPI.Controllers
 {
@@ -57,7 +56,7 @@ namespace Pitstop.Application.CustomerManagementAPI.Controllers
 
                     // send event
                     CustomerRegistered e = command.MapToCustomerRegistered();
-                    await _messagePublisher.PublishMessageAsync(e.MessageType, e , "");
+                    await _messagePublisher.PublishMessageAsync(e.MessageType, e, "");
 
                     // return result
                     return CreatedAtRoute("GetByCustomerId", new { customerId = customer.CustomerId }, customer);
@@ -69,6 +68,60 @@ namespace Pitstop.Application.CustomerManagementAPI.Controllers
                 ModelState.AddModelError("", "Unable to save changes. " +
                     "Try again, and if the problem persists " +
                     "see your system administrator.");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+                throw;
+            }
+        }
+
+        [HttpPut]
+        [Route("{customerId}")]
+        public async Task<IActionResult> UpdateAsync([FromRoute] string customerId, [FromBody] UpdateCustomer command)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var existingCustomer = await _dbContext.Customers
+                        .FirstOrDefaultAsync(o => o.CustomerId == customerId);
+
+                    if (existingCustomer == null)
+                        return NotFound();
+
+                    existingCustomer.CustomerId = command.CustomerId;
+                    existingCustomer.Address = command.Address;
+                    existingCustomer.City = command.City;
+                    existingCustomer.EmailAddress = command.EmailAddress;
+                    existingCustomer.Name = command.Name;
+                    existingCustomer.PostalCode = command.PostalCode;
+                    existingCustomer.TelephoneNumber = command.TelephoneNumber;
+
+                    try
+                    {
+                        _dbContext.Customers.Update(existingCustomer);
+                    }
+                    catch (Exception)
+                    {
+                        ModelState.AddModelError("", "Unable to save changes. " +
+                              "Try again, and if the problem persists " +
+                              "see your system administrator.");
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                        throw;
+                    }
+
+                    await _dbContext.SaveChangesAsync();
+
+                    var e = command.MapToCustomerUpdated();
+                    await _messagePublisher.PublishMessageAsync(e.MessageType, e, "");
+
+                    return Ok();
+                }
+                return BadRequest();
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError("", "Unable to save changes. " +
+                      "Try again, and if the problem persists " +
+                      "see your system administrator.");
                 return StatusCode(StatusCodes.Status500InternalServerError);
                 throw;
             }
