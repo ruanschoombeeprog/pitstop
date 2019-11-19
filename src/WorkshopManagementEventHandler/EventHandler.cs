@@ -4,7 +4,6 @@ using Newtonsoft.Json.Linq;
 using Pitstop.Infrastructure.Messaging;
 using Pitstop.WorkshopManagementEventHandler.DataAccess;
 using Pitstop.WorkshopManagementEventHandler.Events;
-using Pitstop.WorkshopManagementEventHandler.Mappers;
 using Pitstop.WorkshopManagementEventHandler.Model;
 using Serilog;
 using System;
@@ -76,19 +75,19 @@ namespace Pitstop.WorkshopManagementEventHandler
                         break;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string messageId = messageObject.Property("MessageId") != null ? messageObject.Property("MessageId").Value<string>() : "[unknown]";
                 Log.Error(ex, "Error while handling {MessageType} message with id {MessageId}.", messageType, messageId);
             }
 
             // always akcnowledge message - any errors need to be dealt with locally.
-            return true; 
+            return true;
         }
 
         private async Task<bool> HandleAsync(VehicleRegistered e)
         {
-            Log.Information("Register Vehicle: {LicenseNumber}, {Brand}, {Type}, Owner Id: {OwnerId}", 
+            Log.Information("Register Vehicle: {LicenseNumber}, {Brand}, {Type}, Owner Id: {OwnerId}",
                 e.LicenseNumber, e.Brand, e.Type, e.OwnerId);
 
             try
@@ -102,7 +101,7 @@ namespace Pitstop.WorkshopManagementEventHandler
                 });
                 await _dbContext.SaveChangesAsync();
             }
-            catch(DbUpdateException)
+            catch (DbUpdateException ex)
             {
                 Console.WriteLine($"Skipped adding vehicle with license number {e.LicenseNumber}.");
             }
@@ -117,11 +116,21 @@ namespace Pitstop.WorkshopManagementEventHandler
 
             try
             {
-                var vehicle = e.ToEntity();
+                using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+                {
+                    var vehicle = await _dbContext.Vehicles.FirstAsync(v => v.LicenseNumber == e.LicenseNumber);
 
-                _dbContext.Vehicles.Update(vehicle);
+                    vehicle.LicenseNumber = e.LicenseNumber;
+                    vehicle.Brand = e.Brand;
+                    vehicle.Type = e.Type;
+                    vehicle.OwnerId = e.OwnerId;
 
-                await _dbContext.SaveChangesAsync();
+                    _dbContext.Vehicles.Update(vehicle);
+
+                    await _dbContext.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                }
             }
             catch (DbUpdateException)
             {
@@ -133,18 +142,24 @@ namespace Pitstop.WorkshopManagementEventHandler
 
         private async Task<bool> HandleAsync(CustomerRegistered e)
         {
-            Log.Information("Register Customer: {CustomerId}, {Name}, {TelephoneNumber}", 
+            Log.Information("Register Customer: {CustomerId}, {Name}, {TelephoneNumber}",
                 e.CustomerId, e.Name, e.TelephoneNumber);
 
             try
             {
-                await _dbContext.Customers.AddAsync(new Customer
+                using (var transaction = await _dbContext.Database.BeginTransactionAsync())
                 {
-                    CustomerId = e.CustomerId,
-                    Name = e.Name,
-                    TelephoneNumber = e.TelephoneNumber
-                });
-                await _dbContext.SaveChangesAsync();
+                    await _dbContext.Customers.AddAsync(new Customer
+                    {
+                        CustomerId = e.CustomerId,
+                        Name = e.Name,
+                        TelephoneNumber = e.TelephoneNumber
+                    });
+
+                    await _dbContext.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                }
             }
             catch (DbUpdateException)
             {
@@ -161,11 +176,20 @@ namespace Pitstop.WorkshopManagementEventHandler
 
             try
             {
-                var customer = e.ToEntity();
+                using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+                {
+                    var customer = await _dbContext.Customers.FirstAsync(c => c.CustomerId == e.CustomerId);
 
-                _dbContext.Customers.Update(customer);
+                    customer.CustomerId = e.CustomerId;
+                    customer.Name = e.Name;
+                    customer.TelephoneNumber = e.TelephoneNumber;
 
-                await _dbContext.SaveChangesAsync();
+                    _dbContext.Customers.Update(customer);
+
+                    await _dbContext.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                }
             }
             catch (DbUpdateException)
             {
@@ -177,48 +201,53 @@ namespace Pitstop.WorkshopManagementEventHandler
 
         private async Task<bool> HandleAsync(MaintenanceJobPlanned e)
         {
-            Log.Information("Register Maintenance Job: {JobId}, {StartTime}, {EndTime}, {CustomerName}, {LicenseNumber}", 
+            Log.Information("Register Maintenance Job: {JobId}, {StartTime}, {EndTime}, {CustomerName}, {LicenseNumber}",
                 e.JobId, e.StartTime, e.EndTime, e.CustomerInfo.Name, e.VehicleInfo.LicenseNumber);
 
             try
             {
-                // determine customer
-                Customer customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.CustomerId == e.CustomerInfo.Id);
-                if (customer == null)
+                using (var transaction = await _dbContext.Database.BeginTransactionAsync())
                 {
-                    customer = new Customer
+                    // determine customer
+                    Customer customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.CustomerId == e.CustomerInfo.Id);
+                    if (customer == null)
                     {
-                        CustomerId = e.CustomerInfo.Id,
-                        Name = e.CustomerInfo.Name,
-                        TelephoneNumber = e.CustomerInfo.TelephoneNumber
-                    };
-                }
+                        customer = new Customer
+                        {
+                            CustomerId = e.CustomerInfo.Id,
+                            Name = e.CustomerInfo.Name,
+                            TelephoneNumber = e.CustomerInfo.TelephoneNumber
+                        };
+                    }
 
-                // determine vehicle
-                Vehicle vehicle = await _dbContext.Vehicles.FirstOrDefaultAsync(v => v.LicenseNumber == e.VehicleInfo.LicenseNumber);
-                if (vehicle == null)
-                {
-                    vehicle = new Vehicle
+                    // determine vehicle
+                    Vehicle vehicle = await _dbContext.Vehicles.FirstOrDefaultAsync(v => v.LicenseNumber == e.VehicleInfo.LicenseNumber);
+                    if (vehicle == null)
                     {
-                        LicenseNumber = e.VehicleInfo.LicenseNumber,
-                        Brand = e.VehicleInfo.Brand,
-                        Type = e.VehicleInfo.Type,
-                        OwnerId = customer.CustomerId
-                    };
-                }
+                        vehicle = new Vehicle
+                        {
+                            LicenseNumber = e.VehicleInfo.LicenseNumber,
+                            Brand = e.VehicleInfo.Brand,
+                            Type = e.VehicleInfo.Type,
+                            OwnerId = customer.CustomerId
+                        };
+                    }
 
-                // insert maintetancejob
-                await _dbContext.MaintenanceJobs.AddAsync(new MaintenanceJob
-                {
-                    Id = e.JobId,
-                    StartTime = e.StartTime,
-                    EndTime = e.EndTime,
-                    Customer = customer,
-                    Vehicle = vehicle,       
-                    WorkshopPlanningDate = e.StartTime.Date,
-                    Description = e.Description
-                });
-                await _dbContext.SaveChangesAsync();
+                    // insert maintetancejob
+                    await _dbContext.MaintenanceJobs.AddAsync(new MaintenanceJob
+                    {
+                        Id = e.JobId,
+                        StartTime = e.StartTime,
+                        EndTime = e.EndTime,
+                        Customer = customer,
+                        Vehicle = vehicle,
+                        WorkshopPlanningDate = e.StartTime.Date,
+                        Description = e.Description
+                    });
+                    await _dbContext.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                }
             }
             catch (DbUpdateException)
             {
@@ -235,21 +264,57 @@ namespace Pitstop.WorkshopManagementEventHandler
 
             try
             {
-                var customer = e.CustomerInfo.FromCustomerInfo();
+                using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+                {
+                    var customer = await _dbContext.Customers
+                        .FirstOrDefaultAsync(c => c.CustomerId == e.CustomerInfo.Id);
 
-                var vehicle = e.VehicleInfo.FromVehicleInfo(customer.CustomerId);
+                    if (customer == null)
+                        throw new InvalidOperationException($"Customer not found {e.CustomerInfo.Id}");
 
-                var job = e.ToEntity(customer, vehicle);
+                    customer.CustomerId = e.CustomerInfo.Id;
+                    customer.Name = e.CustomerInfo.Name;
+                    customer.TelephoneNumber = e.CustomerInfo.TelephoneNumber;
 
-                // insert maintetancejob
+                    var vehicle = await _dbContext.Vehicles
+                        .FirstOrDefaultAsync(v => v.LicenseNumber == e.VehicleInfo.LicenseNumber);
 
-                _dbContext.MaintenanceJobs.Update(job);
+                    if (vehicle == null)
+                        throw new InvalidOperationException($"Vehicle not found {e.VehicleInfo.LicenseNumber}");
 
-                await _dbContext.SaveChangesAsync();
+                    vehicle.LicenseNumber = e.VehicleInfo.LicenseNumber;
+                    vehicle.Brand = e.VehicleInfo.Brand;
+                    vehicle.OwnerId = customer.CustomerId;
+                    vehicle.Type = e.VehicleInfo.Type;
+
+                    var job = await _dbContext.MaintenanceJobs
+                        .FirstOrDefaultAsync(j => j.Id == e.JobId);
+
+                    if (job == null)
+                        throw new InvalidOperationException($"Job not found {e.JobId}");
+
+                    job.Id = e.JobId;
+                    job.StartTime = e.StartTime;
+                    job.EndTime = e.EndTime;
+                    job.Customer = customer;
+                    job.Vehicle = vehicle;
+
+                    // update maintetancejob
+
+                    _dbContext.MaintenanceJobs.Update(job);
+
+                    await _dbContext.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                Log.Warning($"Skipped updating maintenance job: {ex.Message}");
             }
             catch (DbUpdateException)
             {
-                Log.Warning("Skipped adding maintenance job with id {JobId}.", e.JobId);
+                Log.Warning("Skipped updating maintenance job with id {JobId}.", e.JobId);
             }
 
             return true;
@@ -262,12 +327,17 @@ namespace Pitstop.WorkshopManagementEventHandler
 
             try
             {
-                // insert maintetancejob
-                var job = await _dbContext.MaintenanceJobs.FirstOrDefaultAsync(j => j.Id == e.JobId);
-                job.ActualStartTime = e.StartTime;
-                job.ActualEndTime = e.EndTime;
-                job.Notes = e.Notes;
-                await _dbContext.SaveChangesAsync();
+                using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+                {
+                    // insert maintetancejob
+                    var job = await _dbContext.MaintenanceJobs.FirstOrDefaultAsync(j => j.Id == e.JobId);
+                    job.ActualStartTime = e.StartTime;
+                    job.ActualEndTime = e.EndTime;
+                    job.Notes = e.Notes;
+                    await _dbContext.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                }
             }
             catch (DbUpdateException)
             {
