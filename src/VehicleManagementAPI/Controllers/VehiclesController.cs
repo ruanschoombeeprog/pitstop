@@ -1,13 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Pitstop.Application.VehicleManagement.Model;
-using Pitstop.Application.VehicleManagement.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using Pitstop.Infrastructure.Messaging;
-using Pitstop.Application.VehicleManagement.Events;
 using Pitstop.Application.VehicleManagement.Commands;
+using Pitstop.Application.VehicleManagement.DataAccess;
+using Pitstop.Application.VehicleManagement.Model;
+using Pitstop.Infrastructure.Messaging;
 using Pitstop.VehicleManagementAPI.Mappers;
+using System;
+using System.Threading.Tasks;
 
 namespace Pitstop.Application.VehicleManagement.Controllers
 {
@@ -72,6 +72,7 @@ namespace Pitstop.Application.VehicleManagement.Controllers
         }
 
         [HttpPut]
+        [Route("{licenseNumber}")]
         public async Task<IActionResult> UpdateAsync([FromRoute] string licenseNumber, [FromBody] UpdateVehicle command)
         {
             try
@@ -84,9 +85,22 @@ namespace Pitstop.Application.VehicleManagement.Controllers
                     if (existingVehicle == null)
                         return NotFound();
 
-                    var updatedVehicle = command.MapToVehicle();
-
-                    _dbContext.Vehicles.Update(updatedVehicle);
+                    existingVehicle.LicenseNumber = command.LicenseNumber;
+                    existingVehicle.Brand = command.Brand;
+                    existingVehicle.Type = command.Type;
+                    existingVehicle.OwnerId = command.OwnerId;
+                    
+                    try
+                    {
+                        _dbContext.Vehicles.Update(existingVehicle);
+                    }
+                    catch (Exception)
+                    {
+                        ModelState.AddModelError("", "Unable to save changes. " +
+                         "Try again, and if the problem persists " +
+                         "see your system administrator.");
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    }
 
                     await _dbContext.SaveChangesAsync();
 
