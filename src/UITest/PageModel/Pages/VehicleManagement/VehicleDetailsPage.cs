@@ -12,6 +12,12 @@ namespace Pitstop.UITest.PageModel.Pages.VehicleManagement
         {
         }
 
+        public UpdateVehiclePage Edit()
+        {
+            WebDriver.FindElement(By.LinkText("Edit")).Click();
+            return new UpdateVehiclePage(Pitstop);
+        }
+
         public VehicleManagementPage Back()
         {
             WebDriver.FindElement(By.Id("BackButton")).Click();

@@ -1,18 +1,18 @@
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Pitstop.UITest.PageModel.Pages.WorkshopManagement
 {
-    /// <summary>
-    /// Represents the Register MaintenanceJob page.
-    /// </summary>
-    public class RegisterMaintenanceJobPage : PitstopPage
+    public class UpdateMaintenanceJobPage : PitstopPage
     {
-        public RegisterMaintenanceJobPage(PitstopApp pitstop) : base("Workshop Management - schedule maintenance", pitstop)
+        public UpdateMaintenanceJobPage(PitstopApp pitstop) : base("Workshop Management - update maintenance", pitstop)
         {
         }
 
-        public RegisterMaintenanceJobPage FillJobDetails(string startTime, string endTime, string description, string licenseNumber)
+        public UpdateMaintenanceJobPage FillJobDetails(string startTime, string endTime, string description, string licenseNumber)
         {
             var startTimeBox = WebDriver.FindElement(By.Name("StartTime"));
             startTimeBox.Clear();
@@ -22,11 +22,14 @@ namespace Pitstop.UITest.PageModel.Pages.WorkshopManagement
             endTimeBox.Clear();
             endTimeBox.SendKeys(endTime);
 
-            WebDriver.FindElement(By.Name("Description")).SendKeys(description);
-            var webElement = WebDriver.FindElement(By.Id("SelectedVehicleLicenseNumber"));
-            SelectElement select = new SelectElement(webElement);
+            var descriptionElement = WebDriver.FindElement(By.Name("Description"));
+            descriptionElement.Clear();
+            descriptionElement.SendKeys(description);
+
+            var selectElement = WebDriver.FindElement(By.Id("SelectedVehicleLicenseNumber"));
+            var select = new SelectElement(selectElement);
             select.SelectByValue(licenseNumber);
-            
+
             return this;
         }
 

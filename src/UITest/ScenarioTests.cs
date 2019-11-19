@@ -23,18 +23,34 @@ namespace Pitstop.UITest
             var homePage = pitstop.Start();
 
             // act
+
+            // Register Customer
             pitstop.Menu
                 .CustomerManagement()
                 .RegisterCustomer()
                 .Cancel()
                 .RegisterCustomer()
                 .FillCustomerDetails(
-                    $"TestCustomer {testrunId}", "Verzonnenstraat 21", 
+                    $"TestCustomer {testrunId}", "Verzonnenstraat 21",
                     "Uitdeduimerveen", "1234 AZ", "+31612345678", "tc@test.com")
                 .Submit()
                 .SelectCustomer($"TestCustomer {testrunId}")
                 .Back();
 
+            // Update Customer
+            pitstop.Menu
+               .CustomerManagement()
+               .SelectCustomer($"TestCustomer {testrunId}")
+               .Edit()
+               .FillCustomerDetails(
+                    $"TestCustomer {testrunId}", "Verzonnenstraat 21",
+                    "Uitdeduimerveen", "1234 AZ", "+31612345678", "tc@test.com")
+               .Submit()
+               .SelectCustomer($"TestCustomer {testrunId}")
+               .Edit()
+               .Cancel();
+
+            // Register vehicle
             pitstop.Menu
                 .VehicleManagement()
                 .RegisterVehicle()
@@ -43,8 +59,20 @@ namespace Pitstop.UITest
                 .FillVehicleDetails($"Vehicle {testrunId}", "Testla", "Model T", $"TestCustomer {testrunId}")
                 .Submit()
                 .SelectVehicle($"Vehicle {testrunId}")
-                .Back(); 
+                .Back();
 
+            // Update vehicle
+            pitstop.Menu
+               .VehicleManagement()
+               .SelectVehicle($"Vehicle {testrunId}")
+               .Edit()
+               .FillVehicleDetails($"Vehicle {testrunId}", "Testla 123", "Model T", $"TestCustomer {testrunId}")
+               .Submit()
+               .SelectVehicle($"Vehicle {testrunId}")
+               .Edit()
+               .Cancel();
+
+            // Register Maintenance Job
             pitstop.Menu
                 .WorkshopManagement()
                 .RegisterMaintenanceJob()
@@ -53,8 +81,20 @@ namespace Pitstop.UITest
                 .FillJobDetails("08:00", "12:00", $"Job {testrunId}", $"Vehicle {testrunId}")
                 .Submit()
                 .SelectMaintenanceJob($"Job {testrunId}")
-                .Back(); 
+                .Back();
 
+            // Update Maintenance Job
+            pitstop.Menu
+                .WorkshopManagement()
+                .SelectMaintenanceJob($"Job {testrunId}")
+                .Edit()
+                .FillJobDetails("08:00", "12:00", $"Job {testrunId}", $"Vehicle {testrunId}")
+                .Submit()
+                .SelectMaintenanceJob($"Job {testrunId}")
+                .Edit()
+                .Cancel();
+
+            // Finish Maintenance Job
             pitstop.Menu
                 .WorkshopManagement()
                 .SelectMaintenanceJob($"Job {testrunId}")

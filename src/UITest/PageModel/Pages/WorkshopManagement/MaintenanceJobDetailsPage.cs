@@ -12,6 +12,12 @@ namespace Pitstop.UITest.PageModel.Pages.WorkshopManagement
         {
         }
 
+        public UpdateMaintenanceJobPage Edit()
+        {
+            WebDriver.FindElement(By.LinkText("Edit")).Click();
+            return new UpdateMaintenanceJobPage(Pitstop);
+        }
+
         public FinishMaintenanceJobPage Complete()
         {
             WebDriver.FindElement(By.Id("CompleteButton")).Click();
