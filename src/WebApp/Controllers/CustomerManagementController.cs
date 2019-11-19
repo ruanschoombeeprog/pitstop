@@ -49,6 +49,19 @@ namespace PitStop.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Edit(string id)
+        {
+            return await _resiliencyHelper.ExecuteResilient(async () =>
+            {
+                var model = new CustomerManagementEditViewModel
+                {
+                    Customer = await _customerManagementAPI.GetCustomerById(id)
+                };
+                return View(model);
+            }, View("Offline", new CustomerManagementOfflineViewModel()));
+        }
+
+        [HttpGet]
         public IActionResult New()
         {
             var model = new CustomerManagementNewViewModel
@@ -73,6 +86,24 @@ namespace PitStop.Controllers
             else
             {
                 return View("New", inputModel);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit([FromForm] CustomerManagementEditViewModel inputModel)
+        {
+            if (ModelState.IsValid)
+            {
+                return await _resiliencyHelper.ExecuteResilient(async () =>
+                {
+                    var command = inputModel.MapToUpdateCustomer();
+                    await _customerManagementAPI.UpdateCustomer(command.CustomerId, command);
+                    return RedirectToAction("Index");
+                }, View("Offline", new CustomerManagementOfflineViewModel()));
+            }
+            else
+            {
+                return View("Edit", inputModel);
             }
         }
     }

@@ -1,6 +1,5 @@
+using Pitstop.ViewModels;
 using System;
-using Pitstop.ViewModels;
-using Pitstop.ViewModels;
 using WebApp.Commands;
 
 namespace Pitstop.WebApp.Mappers
@@ -11,6 +10,18 @@ namespace Pitstop.WebApp.Mappers
         (
             Guid.NewGuid(),
             Guid.NewGuid().ToString("N"),
+            source.Customer.Name,
+            source.Customer.Address,
+            source.Customer.PostalCode,
+            source.Customer.City,
+            source.Customer.TelephoneNumber,
+            source.Customer.EmailAddress
+        );
+
+        public static UpdateCustomer MapToUpdateCustomer(this CustomerManagementEditViewModel source) => new UpdateCustomer
+        (
+            Guid.NewGuid(),
+            source.Customer.CustomerId,
             source.Customer.Name,
             source.Customer.Address,
             source.Customer.PostalCode,
