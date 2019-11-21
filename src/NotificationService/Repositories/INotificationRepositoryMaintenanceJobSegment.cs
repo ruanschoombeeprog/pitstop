@@ -8,6 +8,7 @@ namespace Pitstop.NotificationService.Repositories
     public interface INotificationRepositoryMaintenanceJobSegment
     {
         Task RegisterMaintenanceJobAsync(MaintenanceJob job);
+        Task UpdateMaintenanceJobAsync(MaintenanceJob job);
         Task<IEnumerable<MaintenanceJob>> GetMaintenanceJobsForTodayAsync(DateTime date);
         Task RemoveMaintenanceJobsAsync(IEnumerable<string> jobIds);
     }

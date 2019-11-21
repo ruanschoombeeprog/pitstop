@@ -123,6 +123,23 @@ namespace Pitstop.NotificationService
             await _repo.RegisterMaintenanceJobAsync(job);
         }
 
+        private async Task HandleAsync(MaintenanceJobUpdated mju)
+        {
+            var job = new MaintenanceJob
+            {
+                JobId = mju.JobId.ToString(),
+                CustomerId = mju.CustomerInfo.Id,
+                LicenseNumber = mju.VehicleInfo.LicenseNumber,
+                StartTime = mju.StartTime,
+                Description = mju.Description
+            };
+
+            Log.Information("Update Maintenance Job: {Id}, {CustomerId}, {VehicleLicenseNumber}, {StartTime}, {Description}", 
+                job.JobId, job.CustomerId, job.LicenseNumber, job.StartTime, job.Description);
+
+            await _repo.UpdateMaintenanceJobAsync(job);
+        }
+
         private async Task HandleAsync(MaintenanceJobFinished mjf)
         {
             Log.Information("Remove finished Maintenance Job: {Id}", mjf.JobId);

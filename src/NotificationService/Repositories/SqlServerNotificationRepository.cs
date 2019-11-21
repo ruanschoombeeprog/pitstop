@@ -129,5 +129,20 @@ namespace Pitstop.NotificationService.Repositories
                 await conn.ExecuteAsync(sql, jobIds.Select(j => new { JobId = j }));
             }
         }
+
+        public async Task UpdateMaintenanceJobAsync(MaintenanceJob job)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                var sql = "UPDATE MaintenanceJob SET ";
+                sql += "LicenseNumber = @LicenseNumber, ";
+                sql += "CustomerId = @CustomerId, ";
+                sql += "StartTime = @StartTime, ";
+                sql += "Description = @Description ";                
+                sql += "WHERE JobId = @JobId ";
+
+                await conn.ExecuteAsync(sql, job);
+            }
+        }
     }
 }
