@@ -56,6 +56,9 @@ namespace Pitstop.NotificationService
                     case "MaintenanceJobPlanned":
                         await HandleAsync(messageObject.ToObject<MaintenanceJobPlanned>());
                         break;
+                    case "MaintenanceJobUpdated":
+                        await HandleAsync(messageObject.ToObject<MaintenanceJobUpdated>());
+                        break;
                     case "MaintenanceJobFinished":
                         await HandleAsync(messageObject.ToObject<MaintenanceJobFinished>());
                         break;
