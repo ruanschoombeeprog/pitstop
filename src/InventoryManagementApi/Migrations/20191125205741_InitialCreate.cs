@@ -13,8 +13,8 @@ namespace Pitstop.InventoryManagementApi.Migrations
                 {
                     ProductCode = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
-                    Quantity = table.Column<string>(nullable: true),
-                    UnitPrice = table.Column<string>(nullable: true)
+                    Quantity = table.Column<int>(nullable: false),
+                    UnitPrice = table.Column<double>(nullable: false)
                 },
                 constraints: table =>
                 {

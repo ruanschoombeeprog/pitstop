@@ -10,5 +10,6 @@ namespace InventoryManagementApi.Repositories
         Task<Inventory> GetItemByProductCode(string productCode);
         Task InsertItem(Inventory registerInventory);
         Task UpdateItem(Inventory updateInvetory);
+        Task UseInventory(InventoryUsed inventoryUsed);
     }
 }

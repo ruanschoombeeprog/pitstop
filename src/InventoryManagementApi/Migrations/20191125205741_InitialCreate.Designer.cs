@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Pitstop.InventoryManagementApi.Migrations
 {
     [DbContext(typeof(InventoryManagementDbContext))]
-    [Migration("20191125124732_InitialCreate")]
+    [Migration("20191125205741_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,11 +29,11 @@ namespace Pitstop.InventoryManagementApi.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Quantity")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
-                    b.Property<string>("UnitPrice")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("UnitPrice")
+                        .HasColumnType("float");
 
                     b.HasKey("ProductCode");
 

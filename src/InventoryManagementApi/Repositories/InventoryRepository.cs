@@ -28,8 +28,8 @@ namespace InventoryManagementApi.Repositories
 
         public async Task InsertItem(Inventory registerInventory)
         {
-                dbContext.Inventories.Add(registerInventory);
-                await dbContext.SaveChangesAsync();           
+            dbContext.Inventories.Add(registerInventory);
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task UpdateItem(Inventory updateInvetory)
@@ -37,11 +37,19 @@ namespace InventoryManagementApi.Repositories
             var item = await dbContext.Inventories
                 .FirstOrDefaultAsync(i => i.ProductCode == updateInvetory.ProductCode);
 
+            item.Quantity = updateInvetory.Quantity;
+
             if (item == null)
                 throw new DbUpdateException("Product code does not exist.");
 
             dbContext.Inventories.Update(item);
 
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task UseInventory(InventoryUsed inventoryUsed)
+        {
+            dbContext.InventoryUseds.Add(inventoryUsed);
             await dbContext.SaveChangesAsync();
         }
     }
