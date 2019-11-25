@@ -11,5 +11,15 @@ namespace InventoryManagementApi.Models
         public double Price { get; set; }
 
         public DateTime DateStamp { get; set; }
+
+        public InventoryUsed(Guid id, string productCode, string jobId, int quantityUsed, double price, DateTime dateStamp)
+        {
+            this.Id = id;
+            this.ProductCode = productCode;
+            this.JobId = jobId;
+            this.QuantityUsed = quantityUsed;
+            this.Price = price;
+            this.DateStamp = dateStamp;
+        }
     }
 }
