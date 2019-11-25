@@ -41,7 +41,7 @@ namespace InventoryManagementApi
             services.AddTransient<IMessagePublisher>((sp) => new RabbitMQMessagePublisher(host, userName, password, "Pitstop"));            
 
             // Register all command handlers in this assembly which will be injected into an executor class.
-            services.RegisterCommandHandlers<IHandler>(typeof(Startup).Assembly);
+            services.RegisterCommandHandlers<IHandler>(this.GetType().Assembly);
             services.AddTransient<ICommandExecutor, CommandExecutor>();
 
             // Add framework services.

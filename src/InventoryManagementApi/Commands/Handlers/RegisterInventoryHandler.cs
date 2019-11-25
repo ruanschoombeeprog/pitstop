@@ -23,6 +23,8 @@ namespace InventoryManagementApi.Commands.Handlers
 
         private Task HandleRegisterInventoryAsync(RegisterInventory command)
         {
+            // TODO: Business rules, exceptions
+
             var inventoryItem = new Inventory(
                 command.ProductCode, 
                 command.Description, 

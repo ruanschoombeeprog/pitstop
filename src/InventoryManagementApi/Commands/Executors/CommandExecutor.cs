@@ -8,12 +8,20 @@ namespace InventoryManagementApi.Commands.Executors
 {
     public class CommandExecutor : ICommandExecutor
     {
-        private IEnumerable<IHandler> commandHandlers;
+        private readonly IEnumerable<IHandler> commandHandlers;
 
         public CommandExecutor(IEnumerable<IHandler> commandHandlers) => this.commandHandlers = commandHandlers;
 
         public Task ExecuteAsync(Command command) => commandHandlers
-            .First(o => o.CommandType == command.GetType())
+            .Where(o => o.CommandType == command.GetType())
+            .Cast<dynamic>() // TODO: Better way of handling the casting
+            .First()
+            .HandleCommandAsync(command);
+
+        public Task<TResponse> ExecuteAsync<TResponse>(Command command) => commandHandlers
+            .Where(o => o.CommandType == command.GetType())
+            .Cast<dynamic>() // TODO: Better way of handling the casting
+            .First()
             .HandleCommandAsync(command);
     }
 }

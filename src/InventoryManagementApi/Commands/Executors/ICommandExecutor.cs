@@ -6,5 +6,6 @@ namespace InventoryManagementApi.Commands.Executors
     public interface ICommandExecutor
     { 
         Task ExecuteAsync(Command command);
+        Task<TResult> ExecuteAsync<TResult>(Command command);
     }
 }
