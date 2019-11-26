@@ -31,6 +31,7 @@ namespace PitStop
             services.AddHttpClient<ICustomerManagementAPI, CustomerManagementAPI>();
             services.AddHttpClient<IVehicleManagementAPI, VehicleManagementAPI>();
             services.AddHttpClient<IWorkshopManagementAPI, WorkshopManagementAPI>();
+            services.AddHttpClient<IInventoryManagementAPI, InventoryManagementAPI>();
 
             services.AddHealthChecks(checks =>
             {

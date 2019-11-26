@@ -1,6 +1,6 @@
 ﻿namespace WebApp.Models
 {
-    public class BusinessRuleViolation
+    public class InventoryRuleViolation
     {
         public string ErrorMessage { get; set; }
     }

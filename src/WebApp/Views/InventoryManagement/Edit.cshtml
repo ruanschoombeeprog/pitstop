@@ -1,0 +1,44 @@
+﻿@model Pitstop.ViewModels.InventoryEditViewModel
+@{
+    ViewData["Title"] = "Edit Inventory";
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
+
+<h3 id="PageTitle">Inventory Management - Edit inventory item</h3>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="well-sm alert-danger">
+        <label>Unable to register: @Model.Error</label>
+    </div>
+}
+
+<form asp-controller="InventoryManagement" asp-action="Edit" method="post">
+    <div class="form-group">
+        <label asp-for="Inventory.ProductCode"></label>
+        <input asp-for="Inventory.ProductCode" type="text" class="form-control" />
+        <span asp-validation-for="Inventory.ProductCode" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Inventory.Description"></label>
+        <input asp-for="Inventory.Description" type="text" class="form-control" />
+        <span asp-validation-for="Inventory.Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Inventory.Quantity"></label>
+        <input asp-for="Inventory.Quantity" type="number" class="form-control" />
+        <span asp-validation-for="Inventory.Quantity" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Inventory.UnitPrice"></label>
+        <input asp-for="Inventory.UnitPrice" type="number" class="form-control" />
+        <span asp-validation-for="Inventory.UnitPrice" class="text-danger"></span>
+    </div>
+    <span><button id="SubmitButton" type="submit" class="btn btn-default">Save</button></span>
+    <span><a id="CancelButton" asp-action="Index" asp-controller="InventoryManagement" class="btn btn-default">Cancel</a></span>
+</form>
+
+
