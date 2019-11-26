@@ -18,12 +18,8 @@ namespace InventoryManagementApi.Repositories
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            
-            builder.Entity<Inventory>().HasKey(i => i.ProductCode);
-            builder.Entity<Inventory>().ToTable(typeof(Inventory).Name);
-
+            builder.ApplyConfiguration(new GenericEntityTypeConfiguration<Inventory>(i => i.ProductCode));
             builder.ApplyConfiguration(new GenericEntityTypeConfiguration<InventoryUsed>(i => i.Id));
-
             base.OnModelCreating(builder);
         }
 

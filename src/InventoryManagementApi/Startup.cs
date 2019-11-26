@@ -1,7 +1,7 @@
 using System;
 using InventoryManagementApi.Commands.Executors;
 using InventoryManagementApi.Commands.Handlers;
-using InventoryManagementApi.Commands.Registration;
+using InventoryManagementApi.Commands.Extensions;
 using InventoryManagementApi.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

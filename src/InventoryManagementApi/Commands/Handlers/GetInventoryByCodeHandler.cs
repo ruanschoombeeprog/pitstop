@@ -16,15 +16,15 @@ namespace InventoryManagementApi.Commands.Handlers
         }
         public Type CommandType => typeof(GetInventoryByCode);
 
-        public Task<Inventory> HandleCommandAsync(Command command)
-        {
-            return HandleGetInventoryByCodeAsync((GetInventoryByCode) command);
-        }
+        public Task<Inventory> HandleCommandAsync(Command command) => HandleCommandAsync((GetInventoryByCode)command);
 
-        private Task<Inventory> HandleGetInventoryByCodeAsync(GetInventoryByCode command)
+        private async Task<Inventory> HandleCommandAsync(GetInventoryByCode command)
         {
+            var result = await repository.GetItemByProductCode(command.ProductCode);
+
             Console.WriteLine($"Command Handled : {command.GetType().Name}");
-            return repository.GetItemByProductCode(command.ProductCode);
+
+            return result;
         }
     }
 }

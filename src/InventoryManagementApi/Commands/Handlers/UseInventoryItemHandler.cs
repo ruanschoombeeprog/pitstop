@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using InventoryManagementApi.Events;
+using InventoryManagementApi.Models;
 using InventoryManagementApi.Repositories;
 using Pitstop.Infrastructure.Messaging;
 using Pitstop.InventoryManagementApi.Domain.Rules;
@@ -35,18 +36,23 @@ namespace InventoryManagementApi.Commands.Handlers
 
             await repository.UpdateItem(inventory);
 
-            var useInventoryItem = new UseInventoryItem(Guid.NewGuid(), 
-                command.JobId, 
-                command.ProductCode, 
-                command.Quantity);
+            var totalPrice = command.Quantity * inventory.UnitPrice;
 
-            
+            var useInventoryItem = new InventoryUsed(Guid.NewGuid(),
+                command.ProductCode,
+                command.JobId,  
+                command.Quantity,
+                totalPrice,
+                DateTime.Now);
+
+            await repository.UseInventory(useInventoryItem);
 
             var @event = new InventoryItemUsed()
             {
                 ProductCode = command.ProductCode,
                 Quantity = command.Quantity,
-                JobId =command.JobId
+                JobId =command.JobId,
+                Price = totalPrice
             };
 
             await messagePublisher.PublishMessageAsync(@event.MessageType, @event, "");

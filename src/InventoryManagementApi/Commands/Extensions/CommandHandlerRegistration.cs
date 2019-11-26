@@ -2,7 +2,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace InventoryManagementApi.Commands.Registration
+namespace InventoryManagementApi.Commands.Extensions
 {
     public static class CommandHandlerRegistration
     {

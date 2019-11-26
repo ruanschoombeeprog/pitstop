@@ -21,12 +21,9 @@ namespace InventoryManagementApi.Commands.Handlers
         
         public Type CommandType => typeof(UpdateInventory);
 
-        public Task HandleCommandAsync(Command command)
-        {
-            return HandleUpdateInventoryAsync((UpdateInventory)command);
-        }
+        public Task HandleCommandAsync(Command command) => HandleCommandAsync((UpdateInventory)command);
 
-        private async Task HandleUpdateInventoryAsync(UpdateInventory command)
+        private async Task HandleCommandAsync(UpdateInventory command)
         {
             command.InventoryPriceShouldBeZerorOrLarger();
             command.InventoryProductCodeLengthShouldBeNineCharactersLong();

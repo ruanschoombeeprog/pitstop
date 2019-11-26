@@ -21,12 +21,9 @@ namespace InventoryManagementApi.Commands.Handlers
 
         public Type CommandType => typeof(RegisterInventory);
 
-        public Task HandleCommandAsync(Command command)
-        {
-            return HandleRegisterInventoryAsync((RegisterInventory)command);
-        }
+        public Task HandleCommandAsync(Command command) => HandleCommandAsync((RegisterInventory)command);
 
-        private async Task HandleRegisterInventoryAsync(RegisterInventory command)
+        private async Task HandleCommandAsync(RegisterInventory command)
         {
             command.InventoryPriceShouldBeZerorOrLarger();
             command.InventoryProductCodeLengthShouldBeNineCharactersLong();
