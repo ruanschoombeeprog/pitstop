@@ -18,10 +18,10 @@ namespace Pitstop.InventoryManagementApi.Domain.Rules
                 throw new InventoryRuleViolationException("UnitPrice should be larger than 0.");
         }
 
-        public static void InventoryProductCodeLengthShouldBeNineCharactersLong(this RegisterInventory registerInventory)
+        public static void InventoryProductCodeLengthShouldBe12CharactersLong(this RegisterInventory registerInventory)
         {
-            if (registerInventory.ProductCode.Length < 9)
-                throw new InventoryRuleViolationException("Inventory ProductCode should be 9 characters long.");
+            if (registerInventory.ProductCode.Length != 12)
+                throw new InventoryRuleViolationException("Inventory ProductCode should be 12 characters long.");
         }
 
         public static void InventoryQuantityShouldBeZeroOrLarger(this UpdateInventory updateInventory)
@@ -36,10 +36,10 @@ namespace Pitstop.InventoryManagementApi.Domain.Rules
                 throw new InventoryRuleViolationException("UnitPrice should be larger than 0.");
         }
 
-        public static void InventoryProductCodeLengthShouldBeNineCharactersLong(this UpdateInventory updateInventory)
+        public static void InventoryProductCodeLengthShouldBe12CharactersLong(this UpdateInventory updateInventory)
         {
-            if (updateInventory.ProductCode.Length < 9)
-                throw new InventoryRuleViolationException("Inventory ProductCode should be 9 characters long.");
+            if (updateInventory.ProductCode.Length != 12)
+                throw new InventoryRuleViolationException("Inventory ProductCode should be 12 characters long.");
         }
 
         public static void UseInventoryQuantityMustBeSmallerOrEqualToInventoryLevel(this UseInventoryItem useInventoryItem, Inventory inventory)

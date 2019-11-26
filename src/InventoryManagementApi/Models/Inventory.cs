@@ -9,10 +9,10 @@ namespace InventoryManagementApi.Models
 
         public Inventory(string productCode, string description, int quantity, double unitPrice)
         {
-            this.ProductCode = productCode;
-            this.Description = description;
-            this.Quantity = quantity;
-            this.UnitPrice = unitPrice;
+            ProductCode = productCode;
+            Description = description;
+            Quantity = quantity;
+            UnitPrice = unitPrice;
         }
     }
 }

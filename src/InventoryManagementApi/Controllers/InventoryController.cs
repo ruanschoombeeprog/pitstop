@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using InventoryManagementApi.Commands;
@@ -5,6 +6,7 @@ using InventoryManagementApi.Commands.Executors;
 using InventoryManagementApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Pitstop.InventoryManagementApi.Domain.Exceptions;
 using Serilog;
 
 namespace InventoryManagementApi.Controllers
@@ -27,17 +29,17 @@ namespace InventoryManagementApi.Controllers
 
             try
             {
-                var response = await commandExecutor
-                    .ExecuteAsync<IEnumerable<Inventory>>(command);
+                var response = await commandExecutor.RunAsync<IEnumerable<Inventory>>(command);
 
                 return Ok(response);
             }
             catch (System.Exception ex)
             {
-                Log.Error($"Unable to process command: {command.GetType().Name} : {ex.Message}");
-
+                string errorMessage = "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.";
+                Log.Error(ex, errorMessage);
                 return StatusCode(StatusCodes.Status500InternalServerError);
-                throw;
             }
         }
 
@@ -48,17 +50,22 @@ namespace InventoryManagementApi.Controllers
 
             try
             {
-                var response = await commandExecutor
-                    .ExecuteAsync<Inventory>(command);
+                if (ModelState.IsValid)
+                {
+                    var response = await commandExecutor.RunAsync<Inventory>(command);
 
-                return Ok(response);
+                    return Ok(response);
+                }
+                return BadRequest();
             }
             catch (System.Exception ex)
             {
-                Log.Error($"Unable to process command: {command.GetType().Name} : {ex.Message}");
-
+                string errorMessage = "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.";
+                Log.Error(ex, errorMessage);
+                ModelState.AddModelError("ErrorMessage", errorMessage);
                 return StatusCode(StatusCodes.Status500InternalServerError);
-                throw;
             }
         }
 
@@ -67,17 +74,27 @@ namespace InventoryManagementApi.Controllers
         {
             try
             {
-                await commandExecutor.ExecuteAsync(command);
+                if (ModelState.IsValid)
+                {
+                    await commandExecutor.ExecuteAsync(command);
+
+                    return Ok();
+                }
+                return BadRequest();
             }
-            catch (System.Exception ex)
+            catch (InventoryRuleViolationException ex)
             {
-                Log.Error($"Unable to process command: {command.GetType().Name} : {ex.Message}");
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-                throw;
+                return StatusCode(StatusCodes.Status409Conflict, new InventoryRuleViolation(ex.Message));
             }
-
-            return Ok();
+            catch (Exception ex)
+            {
+                string errorMessage = "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.";
+                Log.Error(ex, errorMessage);
+                ModelState.AddModelError("ErrorMessage", errorMessage);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPut]
@@ -85,14 +102,26 @@ namespace InventoryManagementApi.Controllers
         {
             try
             {
-                await commandExecutor.ExecuteAsync(command);
-            }
-            catch (System.Exception ex)
-            {
-                Log.Error($"Unable to process command: {command.GetType().Name} : {ex.Message}");
+                if (ModelState.IsValid)
+                {
+                    await commandExecutor.ExecuteAsync(command);
 
+                    return Ok();
+                }
+                return BadRequest();
+            }
+            catch (InventoryRuleViolationException ex)
+            {
+                return StatusCode(StatusCodes.Status409Conflict, new InventoryRuleViolation(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.";
+                Log.Error(ex, errorMessage);
+                ModelState.AddModelError("ErrorMessage", errorMessage);
                 return StatusCode(StatusCodes.Status500InternalServerError);
-                throw;
             }
 
             return Ok();
@@ -105,17 +134,27 @@ namespace InventoryManagementApi.Controllers
         {
             try
             {
-                await commandExecutor.ExecuteAsync(command);
+                if (ModelState.IsValid)
+                {
+                    await commandExecutor.ExecuteAsync(command);
+
+                    return Ok();
+                }
+                return BadRequest();
             }
-            catch (System.Exception ex)
+            catch (InventoryRuleViolationException ex)
             {
-                Log.Error($"Unable to process command: {command.GetType().Name} : {ex.Message}");
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-                throw;
+                return StatusCode(StatusCodes.Status409Conflict, new InventoryRuleViolation(ex.Message));
             }
-
-            return Ok();
+            catch (Exception ex)
+            {
+                string errorMessage = "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.";
+                Log.Error(ex, errorMessage);
+                ModelState.AddModelError("ErrorMessage", errorMessage);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

@@ -7,11 +7,11 @@ namespace InventoryManagementApi.Commands
     {
         public UpdateInventory(Guid messageId, Guid id, string productCode, string description, int quantity, double unitPrice) : base(messageId)
         {
-            this.Id = id;
-            this.ProductCode = productCode;
-            this.Description = description;
-            this.Quantity = quantity;
-            this.UnitPrice = unitPrice;
+            Id = id;
+            ProductCode = productCode;
+            Description = description;
+            Quantity = quantity;
+            UnitPrice = unitPrice;
         }
 
         public Guid Id { get; set; }

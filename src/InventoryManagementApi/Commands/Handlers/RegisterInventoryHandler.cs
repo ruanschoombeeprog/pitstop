@@ -26,7 +26,7 @@ namespace InventoryManagementApi.Commands.Handlers
         private async Task HandleCommandAsync(RegisterInventory command)
         {
             command.InventoryPriceShouldBeZerorOrLarger();
-            command.InventoryProductCodeLengthShouldBeNineCharactersLong();
+            command.InventoryProductCodeLengthShouldBe12CharactersLong();
             command.InventoryQuantityShouldBeZeroOrLarger();
 
             var inventoryItem = new Inventory(

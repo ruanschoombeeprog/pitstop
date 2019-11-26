@@ -32,7 +32,7 @@ namespace InventoryManagementApi.Commands.Executors
         /// <typeparam name="TResponse">The response type</typeparam>
         /// <param name="command">The command being executed</param>
         /// <returns></returns>
-        public Task<TResponse> ExecuteAsync<TResponse>(Command command) => commandHandlers
+        public Task<TResponse> RunAsync<TResponse>(Command command) => commandHandlers
             .Where(o => o.CommandType == command.GetType())
             .Cast<dynamic>() // TODO: Better way of handling the casting
             .First()

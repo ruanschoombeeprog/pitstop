@@ -38,6 +38,8 @@ namespace InventoryManagementApi.Repositories
                 .FirstOrDefaultAsync(i => i.ProductCode == updateInvetory.ProductCode);
 
             item.Quantity = updateInvetory.Quantity;
+            item.Description = updateInvetory.Description;
+            item.UnitPrice = updateInvetory.UnitPrice;
 
             if (item == null)
                 throw new DbUpdateException("Product code does not exist.");

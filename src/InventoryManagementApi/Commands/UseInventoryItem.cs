@@ -7,15 +7,13 @@ namespace InventoryManagementApi.Commands
     {
         public UseInventoryItem(Guid messageId, string jobId, string productCode, int quantity) : base(messageId)
         {
-            this.JobId = jobId;
-            this.ProductCode = productCode;
-            this.Quantity = quantity;
+            JobId = jobId;
+            ProductCode = productCode;
+            Quantity = quantity;
         }
-        
+
         public string JobId { get; set; }
         public string ProductCode { get; set; }
         public int Quantity { get; set; }
-
-
     }
 }

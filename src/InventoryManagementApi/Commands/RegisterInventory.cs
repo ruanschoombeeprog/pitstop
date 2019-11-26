@@ -7,10 +7,10 @@ namespace InventoryManagementApi.Commands
     {
         public RegisterInventory(Guid messageId, string productCode, string description, int quantity, double unitPrice) : base(messageId)
         {
-            this.ProductCode = productCode;
-            this.Description = description;
-            this.Quantity = quantity;
-            this.UnitPrice = unitPrice;
+            ProductCode = productCode;
+            Description = description;
+            Quantity = quantity;
+            UnitPrice = unitPrice;
         }
 
         public string ProductCode { get; set; }
