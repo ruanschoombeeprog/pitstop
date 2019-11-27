@@ -72,6 +72,17 @@ services:
       - "5200"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      
+  inventorymanagementapi:
+    image: pitstop/inventorymanagementapi:1.0
+    build: InventoryManagementAPI
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    ports:
+      - "5300"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
 
   auditlogservice:
     image: pitstop/auditlogservice:1.0
