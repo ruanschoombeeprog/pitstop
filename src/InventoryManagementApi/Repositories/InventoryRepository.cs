@@ -14,25 +14,25 @@ namespace InventoryManagementApi.Repositories
             this.dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Inventory>> GetAll()
+        public async Task<IEnumerable<Inventory>> GetAllAsync()
         {
             return await dbContext.Inventories
                 .ToListAsync();
         }
 
-        public async Task<Inventory> GetItemByProductCode(string productCode)
+        public async Task<Inventory> GetItemByProductCodeAsync(string productCode)
         {
             return await dbContext.Inventories
                 .FirstOrDefaultAsync(c => c.ProductCode == productCode);
         }
 
-        public async Task InsertItem(Inventory registerInventory)
+        public async Task InsertAsync(Inventory registerInventory)
         {
             dbContext.Inventories.Add(registerInventory);
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateItem(Inventory updateInvetory)
+        public async Task UpdateAsync(Inventory updateInvetory)
         {
             var item = await dbContext.Inventories
                 .FirstOrDefaultAsync(i => i.ProductCode == updateInvetory.ProductCode);
@@ -49,7 +49,7 @@ namespace InventoryManagementApi.Repositories
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task UseInventory(InventoryUsed inventoryUsed)
+        public async Task UseInventoryAsync(InventoryUsed inventoryUsed)
         {
             dbContext.InventoryUseds.Add(inventoryUsed);
             await dbContext.SaveChangesAsync();

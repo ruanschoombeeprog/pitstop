@@ -1,14 +1,15 @@
-using System;
-using System.Threading.Tasks;
-using InventoryManagementApi.Events;
-using InventoryManagementApi.Models;
 using InventoryManagementApi.Repositories;
 using Pitstop.Infrastructure.Messaging;
 using Pitstop.InventoryManagementApi.Domain.Rules;
+using Pitstop.InventoryManagementApi.Events;
+using Pitstop.InventoryManagementApi.Events.Extensions;
+using Pitstop.InventoryManagementApi.Models.Extensions;
+using System;
+using System.Threading.Tasks;
 
 namespace InventoryManagementApi.Commands.Handlers
 {
-    public class UseInventoryItemHandler : IHandler<UseInventoryItem>
+    public class UseInventoryItemHandler : ICommandHandler<UseInventoryItem>
     {
         private readonly IInventoryRepository repository;
         private readonly IMessagePublisher messagePublisher;
@@ -28,34 +29,27 @@ namespace InventoryManagementApi.Commands.Handlers
 
         private async Task HandleUseInventoryItemAsync(UseInventoryItem command)
         {
-            var inventory = await repository.GetItemByProductCode(command.ProductCode);
+            var inventory = await repository.GetItemByProductCodeAsync(command.ProductCode);
 
             command.UseInventoryQuantityMustBeSmallerOrEqualToInventoryLevel(inventory);
 
+            // Update Inventory
+
             inventory.Quantity -= command.Quantity;
 
-            await repository.UpdateItem(inventory);
+            await repository.UpdateAsync(inventory);
+
+            // Update InventoryUsed
 
             var totalPrice = command.Quantity * inventory.UnitPrice;
 
-            var useInventoryItem = new InventoryUsed(Guid.NewGuid(),
-                command.ProductCode,
-                command.JobId,  
-                command.Quantity,
-                totalPrice,
-                DateTime.Now);
+            var useInventoryItem = command.ToModel(totalPrice);
 
-            await repository.UseInventory(useInventoryItem);
+            await repository.UseInventoryAsync(useInventoryItem);
 
-            var @event = new InventoryItemUsed()
-            {
-                ProductCode = command.ProductCode,
-                Quantity = command.Quantity,
-                JobId =command.JobId,
-                Price = totalPrice
-            };
+            // Emit event
 
-            await messagePublisher.PublishMessageAsync(@event.MessageType, @event, "");
+            await messagePublisher.publishEventAsync(command.ToEvent());
 
             Console.WriteLine($"Command Handled : {command.GetType().Name}");
         }

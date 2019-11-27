@@ -1,14 +1,15 @@
-using System;
-using System.Threading.Tasks;
-using InventoryManagementApi.Events;
-using InventoryManagementApi.Models;
 using InventoryManagementApi.Repositories;
 using Pitstop.Infrastructure.Messaging;
 using Pitstop.InventoryManagementApi.Domain.Rules;
+using Pitstop.InventoryManagementApi.Events;
+using Pitstop.InventoryManagementApi.Events.Extensions;
+using Pitstop.InventoryManagementApi.Models.Extensions;
+using System;
+using System.Threading.Tasks;
 
 namespace InventoryManagementApi.Commands.Handlers
 {
-    public class UpdateInventoryHandler : IHandler<UpdateInventory>
+    public class UpdateInventoryHandler : ICommandHandler<UpdateInventory>
     {
         private readonly IInventoryRepository repository;
         private readonly IMessagePublisher messagePublisher;
@@ -29,23 +30,9 @@ namespace InventoryManagementApi.Commands.Handlers
             command.InventoryProductCodeLengthShouldBe12CharactersLong();
             command.InventoryQuantityShouldBeZeroOrLarger();
 
-            var inventoryItem = new Inventory(
-                command.ProductCode,
-                command.Description,
-                command.Quantity,
-                command.UnitPrice);
+            await repository.UpdateAsync(command.ToModel());
 
-            await repository.UpdateItem(inventoryItem);
-
-            var inventoryUpdated = new InventoryUpdated()
-            {
-                ProductCode = command.ProductCode,
-                Description = command.Description,
-                Quantity = command.Quantity,
-                UnitPrice = command.UnitPrice
-            };
-
-            await messagePublisher.PublishMessageAsync(inventoryUpdated.MessageType, inventoryUpdated, "");
+            await messagePublisher.publishEventAsync(command.ToEvent());
 
             Console.WriteLine($"Command Handled : {command.GetType().Name}");
         }

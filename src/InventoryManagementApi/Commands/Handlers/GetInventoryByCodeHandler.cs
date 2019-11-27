@@ -6,7 +6,7 @@ using Pitstop.Infrastructure.Messaging;
 
 namespace InventoryManagementApi.Commands.Handlers
 {
-    public class GetInventoryByCodeHandler : IHandler<GetInventoryByCode, Inventory>
+    public class GetInventoryByCodeHandler : ICommandHandler<GetInventoryByCode, Inventory>
     {
         private readonly IInventoryRepository repository;
 
@@ -20,7 +20,7 @@ namespace InventoryManagementApi.Commands.Handlers
 
         private async Task<Inventory> HandleCommandAsync(GetInventoryByCode command)
         {
-            var result = await repository.GetItemByProductCode(command.ProductCode);
+            var result = await repository.GetItemByProductCodeAsync(command.ProductCode);
 
             Console.WriteLine($"Command Handled : {command.GetType().Name}");
 
