@@ -38,11 +38,10 @@ namespace InventoryManagementApi
             string host = configSection["Host"];
             string userName = configSection["UserName"];
             string password = configSection["Password"];
-            services.AddTransient<IMessagePublisher>((sp) => new RabbitMQMessagePublisher(host, userName, password, "Pitstop"));            
+            services.AddTransient<IMessagePublisher>((sp) => new RabbitMQMessagePublisher(host, userName, password, "Pitstop"));
 
-            // Register all command handlers in this assembly which will be injected into an executor class.
-            services.RegisterCommandHandlers<IHandler>(this.GetType().Assembly);
-            services.AddTransient<ICommandExecutor, CommandExecutor>();
+            // add command execution handling classes
+            services.AddCommandHandling(this.GetType().Assembly);
 
             // Add framework services.
             services
