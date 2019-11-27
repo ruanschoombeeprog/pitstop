@@ -20,7 +20,7 @@ namespace InventoryManagementApi.Commands.Executors
         /// </summary>
         /// <param name="command">The command being executed</param>
         /// <returns>Task</returns>
-        public Task ExecuteAsync(Command command) => commandHandlers
+        public Task RunAsync(Command command) => commandHandlers
             .Where(o => o.CommandType == command.GetType())
             .Cast<dynamic>() // TODO: Better way of handling the casting
             .First()

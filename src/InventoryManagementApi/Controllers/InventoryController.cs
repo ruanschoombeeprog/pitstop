@@ -76,7 +76,7 @@ namespace InventoryManagementApi.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    await commandExecutor.ExecuteAsync(command);
+                    await commandExecutor.RunAsync(command);
 
                     return Ok();
                 }
@@ -104,7 +104,7 @@ namespace InventoryManagementApi.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    await commandExecutor.ExecuteAsync(command);
+                    await commandExecutor.RunAsync(command);
 
                     return Ok();
                 }
@@ -136,7 +136,7 @@ namespace InventoryManagementApi.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    await commandExecutor.ExecuteAsync(command);
+                    await commandExecutor.RunAsync(command);
 
                     return Ok();
                 }
