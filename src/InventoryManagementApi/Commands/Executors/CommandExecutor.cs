@@ -11,9 +11,9 @@ namespace InventoryManagementApi.Commands.Executors
     /// </summary>
     public class CommandExecutor : ICommandExecutor
     {
-        private readonly IEnumerable<IHandler> commandHandlers;
+        private readonly IEnumerable<ICommandHandler> commandHandlers;
 
-        public CommandExecutor(IEnumerable<IHandler> commandHandlers) => this.commandHandlers = commandHandlers;
+        public CommandExecutor(IEnumerable<ICommandHandler> commandHandlers) => this.commandHandlers = commandHandlers;
 
         /// <summary>
         /// This method matches a command type to a command handler and executes the command returning no result. 
@@ -22,7 +22,7 @@ namespace InventoryManagementApi.Commands.Executors
         /// <returns>Task</returns>
         public Task RunAsync(Command command) => commandHandlers
             .Where(o => o.CommandType == command.GetType())
-            .Cast<dynamic>() // TODO: Better way of handling the casting
+            .Cast<dynamic>()
             .First()
             .HandleCommandAsync(command);
 
@@ -34,7 +34,7 @@ namespace InventoryManagementApi.Commands.Executors
         /// <returns></returns>
         public Task<TResponse> RunAsync<TResponse>(Command command) => commandHandlers
             .Where(o => o.CommandType == command.GetType())
-            .Cast<dynamic>() // TODO: Better way of handling the casting
+            .Cast<dynamic>()
             .First()
             .HandleCommandAsync(command);
     }

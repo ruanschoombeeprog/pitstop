@@ -5,17 +5,17 @@ using Pitstop.Infrastructure.Messaging;
 
 namespace InventoryManagementApi.Commands.Handlers
 {
-    public interface IHandler
+    public interface ICommandHandler
     {
         Type CommandType { get; }
     }
 
-    public interface IHandler<T> : IHandler where T : Command
+    public interface ICommandHandler<T> : ICommandHandler where T : Command
     {
         Task HandleCommandAsync(Command command);
     }
 
-    public interface IHandler<T, U> : IHandler where T : Command
+    public interface ICommandHandler<T, U> : ICommandHandler where T : Command
     {
         Task<U> HandleCommandAsync(Command command);
     }
